@@ -1,0 +1,21 @@
+# Virtual env
+samarthvenv/
+venv/
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pkl
+
+# Data/cache (if you don't want to push large caches)
+# Uncomment if you want to exclude data_cache
+# data_cache/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
