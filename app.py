@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """
 Project Samarth - Intelligent Q&A System
 Streamlit Frontend Application - FIXED VERSION
@@ -932,5 +931,4 @@ def main():
     st.caption("💡 Tip: Try asking about specific districts, crops, years, or seasons for detailed insights!")
 
 if __name__ == "__main__":
->>>>>>> 682e4b9c (Initial commit of Project Samarth)
     main()
