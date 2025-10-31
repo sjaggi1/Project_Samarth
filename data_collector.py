@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """
 Data Collector Module for Project Samarth
 Fetches and caches data from data.gov.in
@@ -118,7 +117,6 @@ if __name__ == "__main__":
     data = collector.get_all_data()
     print("Data loaded successfully!")
     print(f"Crop production records: {len(data['crop_production'])}")
-=======
 """
 Data Collector Module for Project Samarth
 Fetches and caches data from data.gov.in
@@ -238,5 +236,4 @@ if __name__ == "__main__":
     data = collector.get_all_data()
     print("Data loaded successfully!")
     print(f"Crop production records: {len(data['crop_production'])}")
->>>>>>> 682e4b9c (Initial commit of Project Samarth)
     print(f"Rainfall records: {len(data['rainfall'])}")
