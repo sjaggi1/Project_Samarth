@@ -117,4 +117,3 @@ if __name__ == "__main__":
     data = collector.get_all_data()
     print("Data loaded successfully!")
     print(f"Crop production records: {len(data['crop_production'])}")
-    print(f"Rainfall records: {len(data['rainfall'])}")
