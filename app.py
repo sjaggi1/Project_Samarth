@@ -1,6 +1,6 @@
 """
 Project Samarth - Intelligent Q&A System
-Streamlit Frontend Application - Updated Version (with Manual Query Trigger)
+Streamlit Frontend Application - Optimized Version
 """
 
 import streamlit as st
@@ -56,7 +56,6 @@ for key, default in {
     'query_engine': None,
     'chat_history': [],
     'current_question': "",
-    'user_input': "",
     'data': None
 }.items():
     if key not in st.session_state:
@@ -119,6 +118,7 @@ def render_visualizations(data):
     # Rainfall & crops
     elif 'rainfall' in data and 'crops' in data:
         col1, col2 = st.columns(2)
+
         with col1:
             st.markdown("### 📈 Average Rainfall")
             rf_data = data['rainfall']
@@ -137,6 +137,7 @@ def render_visualizations(data):
                     showlegend=False
                 )
                 st.plotly_chart(fig, use_container_width=True)
+
         with col2:
             st.markdown("### 🌾 Top Crops Production")
             crop_data = data['crops']
@@ -165,6 +166,7 @@ def render_visualizations(data):
         crop_trend = pd.Series(data['crop_trend'])
         rain_trend = pd.Series(data.get('rainfall_trend', {}))
         fig = go.Figure()
+
         fig.add_trace(go.Scatter(
             x=crop_trend.index,
             y=crop_trend.values,
@@ -172,6 +174,7 @@ def render_visualizations(data):
             line=dict(color='#4CAF50', width=3),
             mode='lines+markers'
         ))
+
         if not rain_trend.empty:
             fig.add_trace(go.Scatter(
                 x=rain_trend.index,
@@ -192,6 +195,7 @@ def render_visualizations(data):
                 )
             )
         st.plotly_chart(fig, use_container_width=True)
+
         if 'correlation' in data:
             corr = data['correlation']
             st.metric("Correlation Coefficient", f"{corr:.3f}",
@@ -244,7 +248,6 @@ def main():
 
         st.divider()
 
-        # ✅ Updated Sidebar Sample Questions Section
         st.subheader("💡 Sample Questions")
         sample_questions = [
             "What is the area of rice cultivation in Amritsar district Punjab in 2020?",
@@ -254,22 +257,22 @@ def main():
             "Analyze rice production trend in Punjab over last 5 years"
         ]
         for i, q in enumerate(sample_questions):
-            if st.sidebar.button(f"Q{i+1}: {q[:30]}...", key=f"sample_sidebar_{i}", use_container_width=True):
-                # Only set question — do not query yet
+            if st.button(f"Q{i+1}: {q[:30]}...", key=f"sample_sidebar_{i}", use_container_width=True):
+                # Instantly copy to text area without rerun
                 st.session_state.current_question = q
-                st.session_state.user_input = q
 
     # Main content
     if not st.session_state.data_loaded:
         st.info("👈 Configure your API key and load data to begin.")
         return
 
-    # ✅ Input box for user question
+    # Query area
     st.subheader("🤖 Ask Your Question")
-    user_query = st.text_input(
-        "Ask your question here:",
-        value=st.session_state.get("user_input", ""),
-        key="user_query"
+    question = st.text_area(
+        "Enter your question:",
+        value=st.session_state.current_question,
+        height=100,
+        placeholder="e.g., Which district has highest wheat production in Punjab in Rabi season in 2020?"
     )
 
     col1, col2 = st.columns([1, 5])
@@ -280,28 +283,22 @@ def main():
 
     if clear_button:
         st.session_state.chat_history = []
-        st.session_state.user_input = ""
         st.session_state.current_question = ""
-        st.experimental_rerun()
 
-    if ask_button:
-        query = user_query.strip()
-        if not query:
-            st.warning("Please enter a question before asking.")
-        elif not st.session_state.query_engine:
+    if ask_button and question:
+        if not st.session_state.query_engine:
             st.error("❌ Query engine not initialized. Load data first.")
         else:
             with st.spinner("🔎 Processing your question..."):
-                result = st.session_state.query_engine.answer_question(query)
+                result = st.session_state.query_engine.answer_question(question)
                 st.session_state.chat_history.append({
-                    "question": query,
+                    "question": question,
                     "result": result,
                     "timestamp": datetime.now()
                 })
-                st.session_state.user_input = ""
-                st.experimental_rerun()
+                st.session_state.current_question = ""
 
-    # Display results
+    # Display query results
     if st.session_state.chat_history:
         st.divider()
         st.subheader("📝 Query Results")
@@ -319,9 +316,27 @@ def main():
                         st.markdown(f"- {s}")
                 st.markdown('<div class="source-tag">✅ Data sourced from data.gov.in</div>', unsafe_allow_html=True)
 
+    # 🌾 Sample Questions on Main Screen (instant copy to text area)
+    st.divider()
+    st.subheader("💡 Try These Sample Questions")
+    sample_questions_main = [
+        "What is the area of rice cultivation in Amritsar district Punjab in 2020?",
+        "Which district has highest wheat production in Punjab?",
+        "Which district has highest wheat production in Punjab in Rabi season in 2020?",
+        "What is the area of wheat cultivation in Ludhiana district Punjab in 2020 in Rabi season?",
+        "Analyze rice production trend in Punjab over last 5 years"
+    ]
+
+    cols = st.columns(3)
+    for i, q in enumerate(sample_questions_main):
+        with cols[i % 3]:
+            if st.button(f"🌾 {q[:35]}...", key=f"main_q_{i}", use_container_width=True):
+                # Just copy to text box (no rerun)
+                st.session_state.current_question = q
+
     # Footer
     st.divider()
-    st.caption("💡 Tip: Click a sample question to fill it, then press 'Ask' to run the query!")
+    st.caption("💡 Tip: Ask about specific districts, crops, years, or seasons for more insights!")
 
 
 if __name__ == "__main__":
